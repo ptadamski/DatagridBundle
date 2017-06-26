@@ -1,3 +1,29 @@
 parameters:
 
-services:
+services:        
+    datagrid.metadata.attribute:
+        class: DatagridBundle\Serializer\Metadata\AttributeMetadataHandler
+        
+    datagrid.metadata.factory.doctrine:
+        class: DatagridBundle\Serializer\Metadata\DoctrineMetadataFactory
+        arguments: 
+            - '@doctrine.orm.entity_manager'
+            - '@datagrid.metadata.attribute'
+        
+    datagrid.normalizer.classaware:
+        class: DatagridBundle\Serializer\Normalizer\ClassAwareNormalizer
+        
+    datagrid.normalizer.doctrine:
+        class: Symfony\Component\Serializer\Normalizer\ObjectNormalizer
+        arguments: 
+            - '@datagrid.metadata.factory.doctrine'
+            - '@serializer.name_converter.camel_case_to_snake_case'
+            - '@serializer.property_accessor'
+            - '@doctrine.orm.entity_manager.property_info_extractor'
+        
+    datagrid.normalizer.configaware:
+        class: DatagridBundle\Serializer\Normalizer\ConfigurationAwareNormalizer
+        arguments: 
+            - '@datagrid.normalizer.doctrine'
+            - '@datagrid.config.factory.normalizer'
+    
